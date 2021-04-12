@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <table id="table" class="table"></table>
+    
+    <script>
+        /**
+        TODO : 
+            . gestion des demi heures
+            . style du tableau
+        */
+
+
+        const MINUTE = 60
+        const SECONDE = 60
+        const HEURE = 60
+        
+        /**
+            Class plannificateur: csontructeur de tableau stylisié.
+            Permet d'afficher les horaires d'astreintes / travail des différents acteur donnés.
+        */
+        class Plannificateur {
+            //constructeur
+            constructor(id) {
+                this.id = id;
+                this.init(); // le tableai s'initialise de lui même
+            }
+            processHeure(heureDebut, heureFin) {
+                
+                var response =[
+                [parseInt(heureDebut), Math.abs(parseInt(heureDebut.split('.')[1]))],
+                [parseInt(heureFin), Math.abs(parseInt(heureFin.split('.')[1]))]
+                ]
+                return response;
+            }
+
+            init() {
+                //array test de salariés et horaire
+                var data = [
+                    [
+                        'thierry', '12.58', '18.20'
+                    ],
+                    [
+                        'jean', '8.36', '10.20'
+                    ],
+                    [
+                        'jacques', '10.50', '19.20'
+                    ]
+                ];
+                //Heure de début de journée
+                const HEUREDEDEBUT = 4;
+                //nombre de colonnes du tableau
+                const TROISJOURS = 3;
+                const HEURESPARJOUR = 16;
+    
+                var nombreDeColonnes = HEUREDEDEBUT + (HEURESPARJOUR * TROISJOURS) ; // x heures + la cellule vide
+                
+                // récupération du tableau
+                var table = document.getElementById(this.id);
+                
+                table.style.borderCollapse = "collapse"
+
+                // création du tableau
+                var thread = document.createElement('thead');
+                
+                var tbody = document.createElement('tbody');
+
+                // Colonnes  heures
+                var trHeader = document.createElement('tr');
+                let varHeure;
+                let day
+
+                 // row des jours
+                for (var i = 0; i < nombreDeColonnes; i++) {
+                        if(i == 0){
+                            varHeure = i
+                            day = 1;
+                        }
+                        var th = document.createElement('th');
+                        th.style.border = "1px solid #DDEEEE"
+                        th.style.backgroundColor = "#DDEEEE"
+                        th.style.width ="50px"
+                        th.style.height ="30px"
+                        
+                       
+                    if(varHeure == 20){
+                        
+                        varHeure = 1;
+                        
+                    }
+
+                    if(varHeure == 20 / 2){
+                        var txt
+                        if(day == 1){
+                            txt = document.createTextNode("jour 3");
+                        }
+                        else if(day == 2){
+                            txt = document.createTextNode("jour 2");
+                        }
+
+                        else if(day == 3){
+                            txt = document.createTextNode("jour 3");
+                        }
+                        else{
+                            txt = document.createTextNode("");
+                        }
+                        th.appendChild(txt)
+                        day ++
+                    }
+                    
+                    varHeure ++;
+                    trHeader.append(th);
+                    
+                }
+
+               
+                for (var i = 0; i < nombreDeColonnes; i++) {
+
+                    var th = document.createElement('td');
+                    th.style.border = "1px solid #DDEEEE"
+                    th.style.backgroundColor = "#DDEEEE"
+                    th.style.width ="50px"
+                    th.style.height ="30px"
+                    
+                    if(varHeure == 20){
+                        varHeure = 1;
+                       
+                        
+                    }
+                    if (i == 0) {
+                        varHeure = i;
+                        
+                        tbody.append(th);
+                    }
+                    else {
+                        var horaire = (varHeure + (HEUREDEDEBUT - 1)) + 'h';
+                        var text = document.createTextNode(horaire);
+                        th.appendChild(text);
+                        tbody.append(th);
+                       
+                    }
+                    varHeure ++;
+
+                }
+
+                //barre de l"heure
+                let barreHeureActuelle = document.createElement('div')
+                barreHeureActuelle.style.width = "2px"
+                barreHeureActuelle.style.backgroundColor = "red"
+                barreHeureActuelle.style.position = "absolute"
+                barreHeureActuelle.style.borderRadius = "3px"
+                tbody.appendChild(barreHeureActuelle)
+
+
+
+
+                // lignes/row de test
+                var nombreDeLigne = data.length;
+                for (var i = 0; i < nombreDeLigne; i++) {
+                    var tr = document.createElement('tr');
+                    tr.style.border = "1px solid #DDEEEE"
+                    var processedHeures = this.processHeure(data[i][1], data[i][2]);
+                    var heureDebut = processedHeures[0];
+                    var heureFin = processedHeures[1]; 
+                    let tdwidth = 0
+                    for (var y = 0; y < nombreDeColonnes; y++){
+                        //première case contient le nom
+                        var td = document.createElement('td');
+                        td.style.border = "1px solid #DDEEEE"
+                        
+                        td.style.width = "50px"
+                        td.style.height ="30px"
+                        
+                        if (y == 0) {
+                           
+                            var text = document.createTextNode(data[i][0]);
+                            td.style.padding = "5px"
+                            td.classList.add("noms");
+                            td.appendChild(text);
+                    
+                            
+                        }
+
+                      
+                        tr.appendChild(td);
+
+                    }
+                    
+                    
+                    let test = document.createElement('div');
+                    let temps = heureFin[0] - heureDebut[0]
+                    test.style.width =   temps * 50 + "px"
+                    test.style.height = "10px"
+                    test.style.top = i * 43 + 75 + "px" 
+                    test.classList.add('times')
+                    test.id = heureDebut[0]+":"+heureDebut[1]
+                    test.style.backgroundColor = "blue"
+                    test.style.position = "absolute"
+                    test.style.borderRadius = "3px"
+                    tbody.appendChild(test)
+                    tbody.appendChild(tr);
+                }
+
+                //remplissage du tableau
+                thread.appendChild(trHeader);
+                table.appendChild(thread);
+                table.appendChild(tbody);
+
+            
+                let nameTd = document.querySelectorAll('.noms')[0].offsetWidth 
+                let tdwidth = document.querySelectorAll('th')[2].offsetWidth
+                document.querySelectorAll('.times').forEach(elm =>{
+                     
+                    let nameElm = parseInt(nameTd)
+                    let startHourWidth = (parseInt(elm.id.split(':')[0]) - HEUREDEDEBUT) * tdwidth // le début de l'evenement est égal a l'heure de début * la taille d'une case
+                    let startMineWidth = Math.round(parseInt(elm.id.split(':')[1])  * tdwidth / MINUTE) // on la taille en pixel du temps en minute en produit en croix : les minutes * la taille de la case / par une minute soit => la taille en pixel du temps en minute
+                    let left  =  startHourWidth + startMineWidth + nameTd +"px" // pour obtenir le commencement on aditionne lh'eure de début + les minutes + la taille de la premiere colonne
+                    elm.style.left = left
+                    
+                    
+                })
+
+                let date = new Date()
+                let heure  = date.getHours();
+                let minutes = date.getMinutes()
+
+                console.log(heure)
+                console.log(minutes)
+                let startHour = (parseInt(heure) - HEUREDEDEBUT) * tdwidth // le début de l'evenement est égal a l'heure de début * la taille d'une case
+                let startMine = Math.round(parseInt(minutes)  * tdwidth / MINUTE) // on la taille en pixel du temps en minute en produit en croix : les minutes * la taille de la case / par une minute soit => la taille en pixel du temps en minute
+                let leftHeure  =  startHour + startMine + nameTd + "px" // pour obtenir le commencement on aditionne lh'eure de début + les minutes + la taille de la premiere colonne
+
+
+                barreHeureActuelle.style.height = table.offsetHeight - 25+"px"
+                barreHeureActuelle.style.left = leftHeure
+                barreHeureActuelle.style.opacity = "0.5"
+                barreHeureActuelle.style.top = 45  + "px" 
+               
+            }
+        }
+        var plan = new Plannificateur('table');
+
+
+
+
+    </script>
+
+</body>
+
+</html>
